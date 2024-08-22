@@ -1,6 +1,6 @@
-source 'https://github.com/CocoaPods/Specs.git'
+source 'https://cdn.cocoapods.org/'
 
-platform :ios, '8.0'
+platform :ios, '12.0'
 
 project 'Espressos'
 
@@ -12,6 +12,6 @@ target :Espressos do
       pod 'FBSnapshotTestCase/Core'
       pod 'Expecta'
       pod 'OCMock'
-      pod 'KIF'
+      pod 'KIF', '~> 3.9.0'
   end
 end
