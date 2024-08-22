@@ -12,6 +12,6 @@ target :Espressos do
       pod 'FBSnapshotTestCase/Core'
       pod 'Expecta'
       pod 'OCMock'
-      pod 'KIF'
+      pod 'KIF', '~> 3.9.0'
   end
 end
