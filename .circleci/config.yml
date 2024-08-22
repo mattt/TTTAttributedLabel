@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  install_dependencies:
+  run_tests:
     macos:
       xcode: 15.4
     resource_class: "macos.m1.medium.gen1"
@@ -38,10 +38,7 @@ workflows:
   version: 2
   test_and_deploy:
     jobs:
-      - install_dependencies
       - run_tests:
-          requires:
-            - install_dependencies
           filters:
             branches:
               only: /.*/
