@@ -9,6 +9,7 @@ jobs:
       - run:
           name: Install CocoaPods and other gems
           command: sudo gem install cocoapods xcpretty obcd -N
+      - checkout
       - run:
           name: Install Pods
           command: pod install --project-directory=Example
@@ -23,6 +24,7 @@ jobs:
       - run:
           name: Pre-start simulator
           command: xcrun instruments -w "iPhone 6 (9.3 Simulator)" || exit 0
+      - checkout
       - run:
           name: Run Tests
           command: |
@@ -31,22 +33,15 @@ jobs:
               -sdk iphonesimulator \
               -destination "platform=iOS Simulator,name=iPhone 6" \
               GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES \
-              clean test | xcpretty -c --report junit --output ${CIRCLE_TEST_REPORTS}/junit.xml
+              clean test | xcpretty -c --report junit --output junit.xml
       - run:
           name: Lint Podspec
           command: pod lib lint --quick
-
-  upload_codecov:
-    macos:
-      xcode: 15.4
-    resource_class: "macos.m1.medium.gen1"
-    environment:
-      LANG: en_US.UTF-8
-      LC_CTYPE: en_US.UTF-8
-    steps:
       - run:
           name: Upload coverage to Codecov
-          command: bash <(curl -s https://codecov.io/bash)
+          command: bash <(curl -s https://codecov.io/bash) -f junit.xml -X xcode
+      - store_test_results:
+          path: junit.xml
 
 workflows:
   version: 2
@@ -56,9 +51,6 @@ workflows:
       - run_tests:
           requires:
             - install_dependencies
-      - upload_codecov:
-          requires:
-            - run_tests
           filters:
             branches:
               only: /.*/
