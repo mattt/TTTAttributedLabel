@@ -22,7 +22,7 @@ jobs:
             set -o pipefail && xcodebuild -workspace 'Example/Espressos.xcworkspace' \
               -scheme 'Espressos' \
               -sdk iphonesimulator \
-              -destination "platform=iOS Simulator,name=iPhone 6" \
+              -destination "platform=iOS Simulator,name=iPhone SE (3rd Generation)" \
               GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES \
               clean test | xcpretty -c --report junit --output junit.xml
       - run:
