@@ -13,18 +13,9 @@ jobs:
       - run:
           name: Install Pods
           command: pod install --project-directory=Example
-  run_tests:
-    macos:
-      xcode: 15.4
-    resource_class: "macos.m1.medium.gen1"
-    environment:
-      LANG: en_US.UTF-8
-      LC_CTYPE: en_US.UTF-8
-    steps:
       - run:
           name: Pre-start simulator
           command: xcrun instruments -w "iPhone 6 (9.3 Simulator)" || exit 0
-      - checkout
       - run:
           name: Run Tests
           command: |
