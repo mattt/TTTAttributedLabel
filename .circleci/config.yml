@@ -1,0 +1,64 @@
+version: 2.1
+
+jobs:
+  install_dependencies:
+    macos:
+      xcode: 15.4
+    resource_class: "macos.m1.medium.gen1"
+    steps:
+      - run:
+          name: Install CocoaPods and other gems
+          command: sudo gem install cocoapods xcpretty obcd -N
+      - run:
+          name: Install Pods
+          command: pod install --project-directory=Example
+  run_tests:
+    macos:
+      xcode: 15.4
+    resource_class: "macos.m1.medium.gen1"
+    environment:
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+    steps:
+      - run:
+          name: Pre-start simulator
+          command: xcrun instruments -w "iPhone 6 (9.3 Simulator)" || exit 0
+      - run:
+          name: Run Tests
+          command: |
+            set -o pipefail && xcodebuild -workspace 'Example/Espressos.xcworkspace' \
+              -scheme 'Espressos' \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,name=iPhone 6" \
+              GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES \
+              clean test | xcpretty -c --report junit --output ${CIRCLE_TEST_REPORTS}/junit.xml
+      - run:
+          name: Lint Podspec
+          command: pod lib lint --quick
+
+  upload_codecov:
+    macos:
+      xcode: 15.4
+    resource_class: "macos.m1.medium.gen1"
+    environment:
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+    steps:
+      - run:
+          name: Upload coverage to Codecov
+          command: bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - install_dependencies
+      - run_tests:
+          requires:
+            - install_dependencies
+      - upload_codecov:
+          requires:
+            - run_tests
+          filters:
+            branches:
+              only: /.*/
